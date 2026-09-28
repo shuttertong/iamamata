@@ -37,10 +37,10 @@
    insert into public.admins (user_id)
    select id from auth.users where email = 'อีเมลผู้ดูแล';
    ```
-6. **Project Settings → API** จดไว้ 2 ค่า:
+6. **Project Settings → API Keys** และ **Data API** จดไว้ 2 ค่า:
    - **Project URL** เช่น `https://abcd1234.supabase.co`
-   - **anon public** key (ขึ้นต้น `eyJ...`)
-   - ⚠️ **ห้ามใช้ `service_role` key** ในเว็บเด็ดขาด (สคริปต์ build จะปฏิเสธถ้าเผลอใส่)
+   - **Publishable key** (ขึ้นต้น `sb_publishable_...`) — หรือ **anon public** key แบบเดิม (ขึ้นต้น `eyJ...`) ใช้แทนกันได้ ค่านี้เปิดเผยได้
+   - ⚠️ **ห้ามใช้ Secret key (`sb_secret_...`) หรือ `service_role` key** ในเว็บเด็ดขาด (สคริปต์ build จะปฏิเสธถ้าเผลอใส่)
 7. (แนะนำ) กันบอท: สร้าง Turnstile site ที่ Cloudflare → ใส่ secret key ใน Supabase **Authentication → Attack Protection → CAPTCHA** และจด **site key** ไว้
 
 ## 3. ใส่ค่า Supabase ใน GitHub
@@ -50,7 +50,7 @@
 | ชื่อ | ค่า |
 |---|---|
 | `SUPABASE_URL` | Project URL จากข้อ 2.6 |
-| `SUPABASE_ANON_KEY` | anon public key จากข้อ 2.6 |
+| `SUPABASE_ANON_KEY` | Publishable key (`sb_publishable_...`) จากข้อ 2.6 |
 | `TURNSTILE_SITE_KEY` | (ถ้ามี) site key จากข้อ 2.7 |
 
 แล้ว **Actions → Deploy to GitHub Pages → Run workflow** — เว็บจะเปลี่ยนจากโหมดทดลองเป็นระบบจริง (แถบเหลืองหายไป)

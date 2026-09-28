@@ -89,8 +89,9 @@ def build_config():
             continue
         if not SAFE_VALUE.match(value):
             raise SystemExit(f'{env} has unexpected characters; refusing to write it into config.js')
-        if env == 'SUPABASE_ANON_KEY' and 'service_role' in value:
-            raise SystemExit('SUPABASE_ANON_KEY looks like a service_role key — never ship that to browsers')
+        # Browsers get the publishable key (sb_publishable_…, or the legacy JWT "anon" key) — never a secret one.
+        if env == 'SUPABASE_ANON_KEY' and ('service_role' in value or value.startswith('sb_secret_')):
+            raise SystemExit('SUPABASE_ANON_KEY is a secret key (sb_secret_… / service_role) — never ship that to browsers')
         text, n = re.subn(rf"({key}:\s*)'[^']*'", lambda m: f"{m.group(1)}'{value}'", text, count=1)
         if not n:
             raise SystemExit(f'config.js has no {key} to set')
