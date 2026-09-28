@@ -1,0 +1,57 @@
+# Monthly: re-bake the static map data with the Python tools, commit it if anything changed, then deploy.
+#   tools/bake_osm.py        → data/area.geojson, data/roads.geojson, data/factories.json (OpenStreetMap)
+#   tools/bake_factories.py  → data/factories-moi.json (Ministry of Industry open data)
+# Also runs by hand: Actions → Refresh map data → Run workflow.
+# Note: GitHub pauses scheduled workflows in repositories with no activity for 60 days; re-enable it in the Actions tab.
+name: Refresh map data
+
+on:
+  schedule:
+    - cron: '0 20 1 * *'     # 03:00 Bangkok time on the 2nd of each month
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Bake OpenStreetMap data
+        run: python3 tools/bake_osm.py
+
+      - name: Bake Ministry of Industry factory list
+        run: python3 tools/bake_factories.py
+
+      - name: Commit if changed
+        id: commit
+        run: |
+          if git diff --quiet -- data/; then
+            echo "No data changes."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git commit -m "chore(data): monthly refresh of map and factory data"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  # A push made with the workflow's own token doesn't trigger other workflows, so deploy from here.
+  deploy:
+    needs: refresh
+    if: needs.refresh.outputs.changed == 'true'
+    uses: ./.github/workflows/pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write

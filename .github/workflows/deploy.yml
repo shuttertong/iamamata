@@ -1,0 +1,65 @@
+# Alternative host: build the website and upload it to Hostinger over FTPS.
+# The default host is GitHub Pages (pages.yml). This one runs only by hand
+# (Actions → Deploy to Hostinger → Run workflow); to make Hostinger the main host, add
+#   push: { branches: [main] }
+# under "on:" and point refresh-data.yml's deploy job at this file.
+#
+# Repository settings → Secrets and variables → Actions:
+#   Secrets:   FTP_SERVER, FTP_USERNAME, FTP_PASSWORD      (hPanel → Files → FTP Accounts)
+#   Variables: FTP_DIR            folder on the FTP account, ending in "/", e.g. public_html/  or  domains/example.com/public_html/flood/
+#              SUPABASE_URL       https://xxxx.supabase.co
+#              SUPABASE_ANON_KEY  the public "anon" key (never the service_role key)
+#              TURNSTILE_SITE_KEY optional
+#              FTP_PROTOCOL       optional: ftps (default) or ftp
+name: Deploy to Hostinger
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+concurrency:
+  group: deploy-hostinger
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main          # after a data refresh, deploy the commit it just pushed
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Build (dist/web)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+        run: python3 tools/build_web.py
+
+      - name: Check settings
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_DIR: ${{ vars.FTP_DIR }}
+        run: |
+          [ -n "$FTP_SERVER" ] || { echo "::error::Secret FTP_SERVER is not set"; exit 1; }
+          [ -n "$FTP_DIR" ] || { echo "::error::Variable FTP_DIR is not set (e.g. public_html/)"; exit 1; }
+          case "$FTP_DIR" in */) ;; *) echo "::error::FTP_DIR must end with /"; exit 1;; esac
+
+      # Uploads only changed files and deletes only files it uploaded earlier
+      # (tracked in .ftp-deploy-sync-state.json on the server), so other files in the folder are left alone.
+      - name: Upload to Hostinger
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_SERVER }}
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          protocol: ${{ vars.FTP_PROTOCOL || 'ftps' }}
+          local-dir: ./dist/web/
+          server-dir: ${{ vars.FTP_DIR }}

@@ -1,0 +1,58 @@
+# Build the website and publish it on GitHub Pages (the default host).
+# Runs on every push to main, by hand, and after the monthly data refresh (refresh-data.yml calls it).
+#
+# One-time setup: repository Settings → Pages → Source: "GitHub Actions".
+# Production config (Settings → Secrets and variables → Actions → Variables):
+#   SUPABASE_URL, SUPABASE_ANON_KEY (public anon key, never service_role), TURNSTILE_SITE_KEY (optional)
+# Without them the site builds in demo mode and shows the yellow "ระบบทดลอง" banner.
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main          # after a data refresh, publish the commit it just pushed
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Build (dist/web)
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          TURNSTILE_SITE_KEY: ${{ vars.TURNSTILE_SITE_KEY }}
+        run: python3 tools/build_web.py
+
+      - uses: actions/configure-pages@v6
+
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: dist/web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
