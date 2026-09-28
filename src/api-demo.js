@@ -3,7 +3,7 @@
 import { uuid, inArea, pathLength } from './ui.js';
 import { queueOrder } from './api.js';
 
-const KEY = 'floodmap.demo.v3';
+const KEY = 'floodmap.demo.v4';   // bumped: sample phones are obviously fake now
 const HOUR = 3600e3;
 const channel = 'BroadcastChannel' in globalThis ? new BroadcastChannel('floodmap-demo') : null;
 
@@ -30,8 +30,8 @@ function seed(cfg) {
     r({ kind: 'help', lat: 13.4225, lng: 101.0590, needs: ['food'], people: 12, note: 'รอตรวจ: หอพักคนงาน อาหารหมด' }, 3, 'pending'),
   ];
   const contacts = {
-    [reports[5].id]: { name: 'คุณเอ (ตัวอย่าง)', phone: '0800000001' },
-    [reports[6].id]: { name: '', phone: '0800000002' },
+    [reports[5].id]: { name: 'คุณเอ (ตัวอย่าง)', phone: '000-000-0001' },
+    [reports[6].id]: { name: '', phone: '000-000-0002' },
   };
   return { reports, edits: [], photos: {}, contacts, seededAt: now };
 }
