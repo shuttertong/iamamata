@@ -32,7 +32,7 @@ python3 tools/serve.py 8010
    (สร้างตาราง, กติกาความปลอดภัย RLS, ที่เก็บรูป `flood-photos`, ตรวจพื้นที่ให้บริการ)
 3. **Authentication → Sign In / Providers**
    - เปิด **Allow anonymous sign-ins** (ผู้แจ้งไม่ต้องสมัครสมาชิก)
-   - ปิด **Allow new users to sign up** ถ้าไม่ต้องการให้คนทั่วไปสมัครด้วยอีเมล
+   - **Allow new users to sign up ต้องเปิดไว้** ไม่อย่างนั้น anonymous sign-in จะใช้ไม่ได้ (คนที่สมัครด้วยอีเมลได้สิทธิ์เท่าผู้แจ้งทั่วไป ไม่ใช่ admin)
 4. (แนะนำ) กันบอท: สร้าง site key ที่ [Cloudflare Turnstile](https://www.cloudflare.com/products/turnstile/)
    แล้วเปิด **Authentication → Attack Protection → CAPTCHA** ใส่ secret key
 5. สร้างบัญชีผู้ดูแล: **Authentication → Users → Add user** (อีเมล + รหัสผ่าน) แล้วรันใน SQL Editor:

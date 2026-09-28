@@ -28,9 +28,10 @@
    - ตั้งรหัสผ่านฐานข้อมูลที่เดายาก แล้วเก็บไว้ในที่ปลอดภัย
 2. **SQL Editor** → New query → วางทั้งไฟล์ `supabase/migrations/0001_init.sql` → **Run**
    ต้องขึ้น `Success` ถ้ามี error ให้คัดลอกข้อความ error มาให้ Claude ดู
-3. **Authentication → Sign In / Providers**
+3. **Authentication → Sign In / Providers** → หัวข้อ **User Signups** แล้วกด **Save changes** ด้านล่าง
+   - **Allow new users to sign up: ต้องเปิดไว้** — ถ้าปิด anonymous sign-in จะใช้ไม่ได้ (Supabase นับเป็นการสมัครแบบหนึ่ง)
    - เปิด **Allow anonymous sign-ins** (ประชาชนแจ้งได้โดยไม่ต้องสมัคร)
-   - ปิด **Allow new users to sign up** (กันคนนอกสมัครเป็นผู้ใช้อีเมล)
+   - เปิด **Confirm email** ไว้ (ค่าเริ่มต้น) — แอปไม่มีหน้าสมัครสมาชิก และต่อให้มีคนสมัครด้วยอีเมลได้ ก็มีสิทธิ์เท่าผู้แจ้งทั่วไป ไม่ใช่ admin (admin ต้องเพิ่มในตาราง `admins` เท่านั้น)
 4. **Authentication → URL Configuration** → Site URL = `https://shuttertong.github.io/iamamata/` (หรือโดเมนของคุณ)
 5. สร้างบัญชีผู้ดูแล: **Authentication → Users → Add user** (อีเมล + รหัสผ่าน, ติ๊ก Auto Confirm) แล้วใน SQL Editor:
    ```sql
@@ -82,6 +83,7 @@
 |---|---|
 | Deploy แดงที่ `configure-pages` / "Pages not enabled" | ทำข้อ 1 (Source: GitHub Actions) — ถ้า repository เป็น Private ต้องเปลี่ยนเป็น Public หรือใช้ GitHub Pro |
 | ยังเห็นแถบ "ระบบทดลอง" | ใส่ Variables `SUPABASE_URL` + `SUPABASE_ANON_KEY` แล้ว Run workflow ใหม่ |
+| กดส่งรายงานแล้วขึ้น "Anonymous sign-ins are disabled" หรือ "Signups not allowed" | ข้อ 2.3: เปิดทั้ง **Allow new users to sign up** และ **Allow anonymous sign-ins** แล้วกด **Save changes** |
 | admin ล็อกอินได้แต่ขึ้น "ไม่ใช่ผู้ดูแล" | ยังไม่ได้รันคำสั่ง `insert into public.admins …` ในข้อ 2.5 |
 | เว็บเปิดได้แต่ข้อมูลเก่า | GitHub Pages แคชไฟล์ประมาณ 10 นาที — รอสักครู่หรือกด Cmd+Shift+R |
 

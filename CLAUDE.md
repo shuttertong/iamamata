@@ -124,7 +124,7 @@ It comes from the user's Google Maps view (@13.4447, 101.0663), calibrated with 
 - The report pin jumps to the device GPS **only when the device is inside the area**. Otherwise the pin would land off the locked map.
 
 ### Default chosen — still to confirm with the user
-- **Login:** reporters use **Supabase anonymous sign-in + Cloudflare Turnstile** (no account; one random id per device). Admins log in with email + password. LINE Login may come later.
+- **Login:** reporters use **Supabase anonymous sign-in + Cloudflare Turnstile** (no account; one random id per device). Anonymous sign-in needs **"Allow new users to sign up" ON** in Supabase Auth (GoTrue treats it as a signup); email sign-ups are harmless (same rights as a reporter, never admin). Admins log in with email + password. LINE Login may come later.
 
 ---
 
