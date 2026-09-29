@@ -4,6 +4,7 @@
 import { CONFIG } from './config.js';
 import { t } from './i18n.js';
 import { el, toast } from './ui.js';
+import { rainOverArea } from './radarscan.js';
 
 const API = 'https://api.rainviewer.com/public/weather-maps.json';
 const R = CONFIG.radar;
@@ -20,8 +21,9 @@ export function createRadar(map, box, { before = [] } = {}) {
   const btn = el('button', { type: 'button', class: 'radar-btn', 'aria-pressed': 'false' });
   const time = el('span', { class: 'radar-time', hidden: true });
   const key = el('span', { class: 'radar-key', hidden: true });   // colour key: light → heavy rain
+  const status = el('span', { class: 'radar-status', hidden: true });   // rain over the area / nearest rain
   const play = el('button', { type: 'button', class: 'radar-play', hidden: true });
-  box.prepend(el('div', { class: 'radar' }, btn, time, play, key));
+  box.prepend(el('div', { class: 'radar' }, btn, time, play, status, key));
 
   const id = (f) => `radar-${f.time}`;
   const beforeId = () => before.find((b) => map.getLayer(b));
@@ -55,10 +57,31 @@ export function createRadar(map, box, { before = [] } = {}) {
       next.filter((f) => !map.getSource(id(f))).forEach((f) => addFrame(json.host, f));
       frames = next;
       if (!playTimer) show(frames.length - 1);
+      describe(json.host, frames.at(-1));
     } catch (e) {
       console.warn('radar', e);
       toast(t('radar.error'));
     }
+  }
+
+  /** Say in words what the latest frame shows over the area (an empty overlay otherwise looks broken). */
+  let scan = null;
+  async function describe(host, frame) {
+    try {
+      scan = await rainOverArea(host, frame, R.scanKm);
+    } catch (e) {
+      console.warn('radar scan', e);
+      scan = null;
+    }
+    drawStatus();
+  }
+  function drawStatus() {
+    status.hidden = !on || !scan;
+    if (!scan) return;
+    status.className = `radar-status${scan.pct ? ' rain' : ''}`;
+    status.textContent = scan.pct ? t('radar.inArea', { p: Math.max(1, Math.round(scan.pct)) })
+      : scan.nearKm != null ? t('radar.near', { km: Math.max(1, Math.round(scan.nearKm)), dir: t(`dir.${scan.dir}`) })
+      : t('radar.none', { km: R.scanKm });
   }
 
   function stopPlay() {
@@ -95,12 +118,15 @@ export function createRadar(map, box, { before = [] } = {}) {
       stopPlay();
       frames.forEach(removeFrame);
       frames = [];
+      scan = null;
+      drawStatus();
     }
   }
 
   function label() {
     btn.textContent = t('radar.btn');
     key.replaceChildren(el('i'), t('radar.key'));
+    drawStatus();
     if (!playTimer) { play.textContent = '▶'; play.setAttribute('aria-label', t('radar.play')); }
   }
 

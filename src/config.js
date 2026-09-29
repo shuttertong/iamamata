@@ -81,5 +81,5 @@ export const CONFIG = {
   },
 
   // Rain radar overlay (src/radar.js): RainViewer past radar, free tier (max zoom 7, past ~2 h).
-  radar: { frames: 12, opacity: 0.5, color: 2, frameMs: 700, refreshMin: 10 },
+  radar: { frames: 12, opacity: 0.5, color: 2, frameMs: 700, refreshMin: 10, scanKm: 120 },   // scanKm: how far to look for the nearest rain
 };

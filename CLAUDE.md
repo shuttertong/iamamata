@@ -81,6 +81,7 @@ A search box over the map, on both pages (`src/search.js`, `src/places.js`).
   - It overlays **RainViewer** past radar (the last 12 frames, one every 10 min ≈ 2 h) at 50 % opacity, **under** the report layers.
   - It shows the frame time ("เรดาร์ 13:10 น. (ล่าสุด)", amber when not the latest) and a "ฝนเบา → หนัก" colour key. ▶ plays the 2 h once and rests on the latest frame; it refreshes every 10 min while on.
   - Turning it off removes every radar layer and source.
+  - **Status line** (`src/radarscan.js`): the latest frame's z7 tiles are read in the browser (RainViewer tiles allow CORS) to say "🌧 มีฝนตกในพื้นที่ (~x%)", "ไม่มีฝนในพื้นที่ · กลุ่มฝนใกล้สุด ~N กม. ทาง…" or "ไม่มีฝนในรัศมี 120 กม." (`CONFIG.radar.scanKm`). An empty overlay otherwise looked broken to the user (2026-09-29: no rain in the area; nearest ~85 km SE).
   - RainViewer's free tier (since 2026-01) has **past frames only, tiles up to zoom 7** (MapLibre scales them up, so it looks blurry at street zoom, but radar is ~1 km anyway), Universal Blue colours, **personal / educational use**, and 100 requests per IP per minute. A commercial deployment needs another radar source.
 - **Sea level / tides** (`src/tide.js`, `CONFIG.tide`; the user's request 2026-09-28): an Open-Meteo **Marine** model point off the Bang Pakong mouth (13.458, 100.875), hourly `sea_level_height_msl` (m above mean sea level; range here about −0.5 … +2 m).
   - The chip says "น้ำทะเลขึ้น/ลง · สูงสุด HH:MM (+x.x ม.)" and turns teal when the next high is ≥ `highM` (1.6 m).
@@ -248,6 +249,7 @@ Admin review flags (`CONFIG.review`):
 │   ├── phonetic.js            # sound keys: English query ↔ Thai-script names
 │   ├── rain.js                # rain chip + 24 h chart (Open-Meteo) + Windy embed
 │   ├── radar.js               # rain radar overlay on our map (RainViewer), playback
+│   ├── radarscan.js           # reads the latest radar frame: rain over the area / nearest rain
 │   ├── tide.js                # sea level / tides (Open-Meteo Marine), rain + high-tide warning
 │   ├── river.js               # Bang Pakong river level (ThaiWater stations), marker + chart + upstream
 │   ├── chart.js               # shared SVG line chart (tide, river)
