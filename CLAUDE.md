@@ -282,6 +282,12 @@ Admin review flags (`CONFIG.review`):
 | F5 | Admin tools: blur faces / plates, merge duplicates, snap road lines to OSM roads | — |
 | F6 | Deploy, custom domain, load test | The public URL works on a phone over 3G |
 
+**Status (2026-09-29): LIVE** at https://shuttertong.github.io/iamamata/ (GitHub Pages, public repo `shuttertong/iamamata`, deployed by Actions).
+- Supabase project `vyvmxmqbxoxyngzzisqe` (Singapore): migration applied; anonymous sign-ins ON ("Allow new users to sign up" must stay ON); admin `shuttertong@…` in `public.admins`; admin login works.
+- Actions variables: SUPABASE_URL, SUPABASE_ANON_KEY (publishable key). Commits use the GitHub noreply address; the user's gmail was removed from history.
+- Verified as anon: help_contacts unreadable, flood_reports/places not insertable or updatable, review_report denied, is_admin false.
+- Still to do: the user's end-to-end test (report + photo → approve → public; SOS phone not public), Turnstile, optional pg_cron jobs (expiry, contact retention), photo retention Edge Function.
+
 **Status (2026-09-28):** F1 and F2 are done and tested in demo mode. Main roads (the user's 7 named roads + estate roads) are highlighted in white (checked at z10–15.5, labels on top, flood lines readable over them). Demo sample data re-seeds itself after 6 h, so it never all expires; the user's own reports are kept. Bang Pakong river level works with live data (BPK001 84% น้ำมาก; three upstream stations over bank on 2026-09-28). Rain outlook works (Open-Meteo chip + chart, Windy embed loads). Rain radar overlay tested (12 frames, playback, off removes layers, layers under reports, RainViewer credit). English sound search is tested. Factory search has ≈ 650 names (Ministry of Industry + OSM); tested with โตโยต้า / ไดกิ / เอ็นโอเค / มิตซูบิชิ / สยาม. Factory search is tested: Thai with and without บจก./spaces, English, no-match message, Enter picks the result, "report here" opens the form at the factory, admin add + CSV import (2 good rows, 2 skipped, quoted comma) are searchable at once. The severity colour ramp is checked. Admin editing is tested (line redraw + depth, spot → line from a map tap, help needs/people, remove). Tested flows:
 - a report with a photo → admin approves → it appears on the public map;
 - "water receded" suggestion → admin approves → removed live in the other tab;
