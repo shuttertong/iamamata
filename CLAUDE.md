@@ -253,6 +253,7 @@ Admin review flags (`CONFIG.review`):
 │   ├── tide.js                # sea level / tides (Open-Meteo Marine), rain + high-tide warning
 │   ├── river.js               # Bang Pakong river level (ThaiWater stations), marker + chart + upstream
 │   ├── chart.js               # shared SVG line chart (tide, river)
+│   ├── panels.js              # fold-away legend / info column toggles
 │   └── style.css
 └── supabase/migrations/0001_init.sql
 ```
@@ -261,6 +262,7 @@ Admin review flags (`CONFIG.review`):
 
 ## 6. UX Rules
 - One thumb: two big buttons at the bottom (🌊 blue, 🆘 red), bottom sheets, 44 px touch targets. On wide screens the sheet becomes a left side panel, and the map is padded so the sheet never covers the pin.
+- **Fold-away panels** (`src/panels.js`, the user's request 2026-09-29): the legend and the rain/river/tide/radar column each have a toggle. The legend starts folded on small screens (`roomy()` = ≥ 800×700); the column starts open. The choice is remembered per device (`floodmap.panel.*`). A folded column keeps the radar overlay on.
 - The report buttons and the legend hide while a sheet is open. Map taps add path points while drawing (`ctx.drawing`), so tapping a report doesn't open it then.
 - User text is always inserted with `textContent` (never `innerHTML`), because reports are untrusted input.
 - Show the time since a report everywhere ("20 นาทีที่แล้ว"); old information is dangerous in a flood.

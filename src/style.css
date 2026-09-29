@@ -358,3 +358,15 @@ body.public .legend { top: calc(116px + var(--banner-h, 0px) + env(safe-area-ins
 body.public .maplibregl-ctrl-top-right { top: var(--banner-h, 0px); }
 .radar-status { flex-basis: 100%; text-align: right; font-size: .78rem; font-weight: 600; color: var(--muted); padding: 0 8px; }
 .radar-status.rain { color: #0d47a1; }
+
+/* ── Fold-away panels ── */
+.panel-toggle {
+  min-height: 32px; padding: 0 12px; border-radius: 99px; font-size: .8rem; font-weight: 600;
+  background: var(--panel); color: var(--ink); border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.legend .panel-toggle { box-shadow: none; border: 0; padding: 0 4px; min-height: 26px; align-self: flex-start; color: var(--muted); }
+.legend.collapsed { padding: 4px 8px; }
+.legend.collapsed .legend-items { display: none; }
+.legend.collapsed .panel-toggle { color: var(--ink); }
+.legend-items { display: flex; flex-direction: column; gap: 2px; }
+.rain.collapsed > :not(.panel-toggle) { display: none !important; }
