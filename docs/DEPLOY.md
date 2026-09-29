@@ -62,6 +62,19 @@
 - ที่ผู้ให้บริการโดเมน (เช่น Hostinger → DNS) เพิ่ม record `CNAME`: `flood` → `shuttertong.github.io`
 - อย่าลืมแก้ Site URL ใน Supabase (ข้อ 2.4) ให้ตรงโดเมนใหม่
 
+## 4.5 (แนะนำ) พื้นที่น้ำท่วมจากดาวเทียม GISTDA
+
+แอปดึง **พื้นที่น้ำท่วมจากดาวเทียมรอบ 3 วันล่าสุด** ของ GISTDA (สทอภ.) มาแสดงเป็นพื้นสีคราม — ต้องมี API Key ของคุณเอง
+
+1. สมัคร/ล็อกอินที่ [disaster.gistda.or.th/services/open-api](https://disaster.gistda.or.th/services/open-api) → **เข้าสู่ระบบ/สมัครใช้งาน API Key** → คัดลอก key
+2. เก็บ key เป็น **Secret** ของ GitHub (ไม่ใช่ Variable — key นี้ต้องไม่อยู่ในหน้าเว็บ):
+   ```bash
+   gh secret set GISTDA_API_KEY -R shuttertong/iamamata
+   ```
+   (คำสั่งจะให้วาง key — ไม่แสดงบนจอและไม่ถูกบันทึกในโค้ด)
+3. ดึงข้อมูลครั้งแรก: `gh workflow run gistda.yml -R shuttertong/iamamata` — หลังจากนั้นดึงเองทุก 3 ชั่วโมง
+4. บนเว็บจะมีป้าย **"🛰 ดาวเทียม…"** ในกลุ่มข้อมูลด้านขวา (ก่อนตั้ง key ป้ายนี้จะซ่อนไว้)
+
 ## 5. ตรวจหลังขึ้นเว็บ
 
 - [ ] เปิดเว็บ — **ต้องไม่มีแถบเหลือง "ระบบทดลอง"** (ถ้ายังมี แปลว่ายังไม่ได้ใส่ Variables ข้อ 3 หรือยังไม่ได้ Run workflow ใหม่)
@@ -85,6 +98,7 @@
 | ยังเห็นแถบ "ระบบทดลอง" | ใส่ Variables `SUPABASE_URL` + `SUPABASE_ANON_KEY` แล้ว Run workflow ใหม่ |
 | กดส่งรายงานแล้วขึ้น "Anonymous sign-ins are disabled" หรือ "Signups not allowed" | ข้อ 2.3: เปิดทั้ง **Allow new users to sign up** และ **Allow anonymous sign-ins** แล้วกด **Save changes** |
 | admin ล็อกอินได้แต่ขึ้น "ไม่ใช่ผู้ดูแล" | ยังไม่ได้รันคำสั่ง `insert into public.admins …` ในข้อ 2.5 |
+| Actions "GISTDA flood areas" แดง: "refused the API key" | key ผิดหรือหมดอายุ → สมัคร/คัดลอกใหม่แล้ว `gh secret set GISTDA_API_KEY …` อีกครั้ง |
 | เว็บเปิดได้แต่ข้อมูลเก่า | GitHub Pages แคชไฟล์ประมาณ 10 นาที — รอสักครู่หรือกด Cmd+Shift+R |
 
 ---

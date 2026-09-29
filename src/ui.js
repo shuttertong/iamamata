@@ -95,6 +95,7 @@ export function renderLegend(box) {
     ...CONFIG.depths.map((d) => depthBadge(d.id)),
     el('span', { class: 'depth' }, el('b', { class: 'path-swatch' }), t('legend.path')),
     el('span', { class: 'depth' }, el('b', { class: 'road-swatch' }), t('legend.roads')),
+    el('span', { class: 'depth' }, el('b', { class: 'gistda-swatch' }), t('legend.gistda')),
     el('span', { class: 'depth' }, el('i', { class: 'sos-dot' }), t('legend.help')),
     el('span', { class: 'depth' }, el('i', { class: 'pending-dot' }), t('legend.pending')),
   );

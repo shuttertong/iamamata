@@ -14,6 +14,7 @@ import { createRadar } from './radar.js';
 import { createTide } from './tide.js';
 import { createRiver } from './river.js';
 import { collapsible, roomy } from './panels.js';
+import { createGistda } from './gistda.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -50,6 +51,9 @@ const tide = createTide(ctx, $('rain'), { rainHours: () => rain.hours });
 const river = createRiver(ctx, $('rain'), map);
 // Radar goes under the report layers so flood spots and SOS pins stay on top.
 const radar = createRadar(map, $('rain'), { before: ['reports-line-casing', 'reports-halo', 'help-halo'] });
+// Satellite flood areas under the reports (and under the radar), chip at the top of the info column.
+const gistda = createGistda(map, $('rain'), { before: ['reports-line-casing', 'reports-halo', 'help-halo'] });
+
 // Fold-away panels: the legend starts folded on phones; the info column starts open.
 const legendPanel = collapsible($('legend'), { key: 'legend', openLabel: 'panel.legendOpen', closedLabel: 'panel.legendClosed', openByDefault: roomy });
 const infoPanel = collapsible($('rain'), { key: 'info', openLabel: 'panel.infoOpen', closedLabel: 'panel.infoClosed' });
@@ -74,6 +78,7 @@ function drawChrome() {
   tide?.label();
   river?.label();
   radar?.label();
+  gistda?.label();
   legendPanel?.label();
   infoPanel?.label();
 }

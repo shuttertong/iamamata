@@ -80,6 +80,9 @@ export const CONFIG = {
     ],
   },
 
+  // GISTDA satellite flood areas (src/gistda.js), baked every 3 h by .github/workflows/gistda.yml.
+  gistda: { file: 'data/gistda-flood.json', color: '#3949ab', refreshMin: 30 },
+
   // Rain radar overlay (src/radar.js): RainViewer past radar, free tier (max zoom 7, past ~2 h).
   radar: { frames: 12, opacity: 0.5, color: 2, frameMs: 700, refreshMin: 10, scanKm: 120 },   // scanKm: how far to look for the nearest rain
 };

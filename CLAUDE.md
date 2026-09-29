@@ -99,6 +99,11 @@ A search box over the map, on both pages (`src/search.js`, `src/places.js`).
   - % = (level − bed) / (bank − bed) × 100, ThaiWater's own measure; it matches their `storage_percent`. The bands are ≤10 น้อยวิกฤต, ≤30 น้อย, ≤70 ปกติ, ≤100 มาก, >100 ล้นตลิ่ง. The chip adds "ต้นน้ำล้นตลิ่ง n สถานี", and the sheet warns when the main station or any upstream station is over its bank.
   - BPK001 is tidal (near the mouth), and the panel says so.
   - Chart drawing is shared with the tide panel (`src/chart.js`; gaps in readings are not joined).
+- **GISTDA satellite flood areas** (`src/gistda.js`, `tools/bake_gistda.py`, `.github/workflows/gistda.yml`; the user's request 2026-09-29):
+  - The API is `https://api-gateway.gistda.or.th/api/2.0/resources/features/flood/{1day|3days|7days|30days}` with header `API-Key`, query `bbox` / `limit` / `offset` / `pv_idn`… Without a key it answers **407**; CORS is open. Tiles (`/maps/flood/3days/tms/{z}/{x}/{y}`, WMS, WMTS) also need the key.
+  - The key is personal, so it **must not ship to the public site**. GitHub Actions bakes the 3-day polygons for the service area every 3 h, with the key as the **secret** `GISTDA_API_KEY`, into `data/gistda-flood.json`. It commits only on change, or daily to refresh `fetched_at`, then deploys.
+  - The app draws an indigo fill (`CONFIG.gistda.color`) under the reports and adds a legend entry. The chip at the top of the info column says "🛰 ดาวเทียมพบน้ำท่วม n พื้นที่ (รอบ 3 วัน)" or "ไม่พบน้ำท่วม"; tapping it fits the areas. The chip stays hidden while `fetched_at` is null (no key yet).
+  - The response shape was not seen yet (no key): the bake accepts a FeatureCollection or `{data|result|items: …}`. **Verify with the first real run.**
 - These are runtime calls from the viewer's browser to open-meteo.com and marine-api.open-meteo.com (every 30 / 60 min), api-v3.thaiwater.net (4 stations every 20 min), windy.com (only when the sheet opens) and rainviewer.com (only while the radar is on); no personal data is sent.
 
 ### Service area (the user's choice, 2026-09-27)
@@ -222,6 +227,7 @@ Admin review flags (`CONFIG.review`):
 ├── data/factories.json        # named factories for search (OSM, baked)
 ├── data/factories-moi.json    # ≈ 620 companies with locations (Ministry of Industry open data, baked)
 ├── tools/bake_factories.py    # re-bakes factories-moi.json from GD Catalog
+├── tools/bake_gistda.py       # GISTDA flood polygons → data/gistda-flood.json (key from env / Actions secret)
 ├── tools/build_web.py         # package the site for hosting (+ production config from env)
 ├── tools/serve.py             # no-cache dev server (stdlib)
 ├── tools/bake_osm.py          # re-bakes both data files from Overpass
@@ -250,6 +256,7 @@ Admin review flags (`CONFIG.review`):
 │   ├── rain.js                # rain chip + 24 h chart (Open-Meteo) + Windy embed
 │   ├── radar.js               # rain radar overlay on our map (RainViewer), playback
 │   ├── radarscan.js           # reads the latest radar frame: rain over the area / nearest rain
+│   ├── gistda.js              # GISTDA satellite flood areas (baked file) + chip
 │   ├── tide.js                # sea level / tides (Open-Meteo Marine), rain + high-tide warning
 │   ├── river.js               # Bang Pakong river level (ThaiWater stations), marker + chart + upstream
 │   ├── chart.js               # shared SVG line chart (tide, river)

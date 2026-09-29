@@ -1,0 +1,55 @@
+# Every 3 hours: fetch GISTDA satellite flood areas for the service area, commit if they changed, deploy.
+# The GISTDA API key stays a repository SECRET (GISTDA_API_KEY) — it never reaches the public website;
+# only the baked data/gistda-flood.json is published. Without the secret the job does nothing.
+name: GISTDA flood areas
+
+on:
+  schedule:
+    - cron: '17 */3 * * *'   # every 3 hours
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: gistda
+  cancel-in-progress: false
+
+jobs:
+  bake:
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.commit.outputs.changed }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.12'
+
+      - name: Fetch GISTDA flood areas
+        env:
+          GISTDA_API_KEY: ${{ secrets.GISTDA_API_KEY }}
+        run: python3 tools/bake_gistda.py
+
+      - name: Commit if changed
+        id: commit
+        run: |
+          if git diff --quiet -- data/gistda-flood.json && [ -z "$(git ls-files --others --exclude-standard data/gistda-flood.json)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/gistda-flood.json
+          git commit -m "chore(data): GISTDA satellite flood areas"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    needs: bake
+    if: needs.bake.outputs.changed == 'true'
+    uses: ./.github/workflows/pages.yml
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
